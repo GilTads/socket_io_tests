@@ -61,6 +61,8 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'comma-dangle': ['error', 'never'],
     'space-before-function-paren': ['error', 'never'],
-    'no-console': 'off'
+    'no-console': 'off',
+    'arrow-parens': 'off',
+    'eslint-no-return-assig': 'off'
   }
 };

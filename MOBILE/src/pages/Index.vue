@@ -1,20 +1,48 @@
 <template>
   <q-layout>
     <q-page-container>
-      <q-page class="flex flex-center">
-        <q-form @submit="onSubmit" class="q-gutter-md">
-          <q-input v-model="message" type="textarea" filled label="Message" />
-          <div>
-            <q-btn label="Submit" type="submit" color="primary" />
-            <q-btn
-              label="Reset"
-              type="reset"
-              color="primary"
-              flat
-              class="q-ml-sm"
-            />
+      <q-page>
+        <div class="row">
+          <div class="col-6 fixed-center">
+            <h2>Socket.io chat</h2>
+            <q-form class="q-gutter-md">
+              <q-input
+                v-model="name"
+                type="text"
+                filled
+                label="Digite seu nome"
+              />
+              <q-input
+                v-model="message"
+                type="text"
+                filled
+                label="Digite o texto"
+              />
+              <q-input
+                v-model="chat"
+                type="textarea"
+                filled
+                readonly
+                label="Chat"
+              />
+              <div>
+                <q-btn
+                  label="Submit"
+                  type="button"
+                  @click="send"
+                  color="primary"
+                />
+                <q-btn
+                  label="Reset"
+                  type="reset"
+                  color="primary"
+                  flat
+                  class="q-ml-sm"
+                />
+              </div>
+            </q-form>
           </div>
-        </q-form>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -25,20 +53,33 @@ import io from 'socket.io-client';
 
 export default {
   name: 'PageIndex',
+  sockets: {
+    connect: () => {
+      console.log('Socket.io conected');
+    }
+  },
   data() {
     return {
+      name: '',
       message: '',
-      socket: {}
+      chat: '',
+      socket: io('localhost:3000')
     };
   },
   created() {
-    this.socket = io('http://localhost:3000');
-    console.log(this.socket);
+    this.socket.on('previuosMessages', messages => {
+      messages.forEach(message => {
+        this.chat = message;
+      });
+    });
+    this.socket.on('receivedOrder', order => {
+      console.log(order.message);
+    });
   },
   methods: {
-    onSubmit() {
+    send() {
       this.socket.emit('sendOrder', {
-        autor: 'App do Gil',
+        name: this.name,
         message: this.message
       });
     }
