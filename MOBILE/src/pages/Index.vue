@@ -18,13 +18,19 @@
                 filled
                 label="Digite o texto"
               />
-              <q-input
-                v-model="chat"
-                type="textarea"
-                filled
-                readonly
-                label="Chat"
-              />
+              <q-list bordered>
+                <q-item clickable v-ripple>
+                  <q-item-section
+                    avatar
+                    v-for="message in messages"
+                    :key="`${message.name}${Math.random()}`"
+                  >
+                    <q-item-label>
+                      {{ message.name }}: {{ message.message }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+              </q-list>
               <div>
                 <q-btn
                   label="Submit"
@@ -49,36 +55,57 @@
 </template>
 
 <script>
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 
 export default {
   name: 'PageIndex',
-  sockets: {
-    connect: () => {
-      console.log('Socket.io conected');
-    }
-  },
   data() {
     return {
       name: '',
       message: '',
-      chat: '',
-      socket: io('localhost:3000')
+      messages: [],
+      isConnected: false
+      // socket: io('localhost:3000')
     };
   },
+  watch: {
+    messages: () => {}
+  },
+  sockets: {
+    connect() {
+      // Fired when the socket connects.
+      console.log(`Conected?: ${this.isConnected}`);
+      this.isConnected = true;
+    },
+
+    disconnect() {
+      this.isConnected = false;
+    },
+
+    // Fired when the server sends something on the "messageChannel" channel.
+    receivedOrder(data) {
+      this.socketMessage = data;
+    },
+
+    previuosMessages(data) {
+      this.messages = data;
+      this.$socket.emit('receivedOrder', data);
+    }
+  },
+
   created() {
-    this.socket.on('previuosMessages', messages => {
-      messages.forEach(message => {
-        this.chat = message;
-      });
-    });
-    this.socket.on('receivedOrder', order => {
-      console.log(order.message);
-    });
+    // this.socket.on('previuosMessages', messages => {
+    //   messages.forEach(message => {
+    //     this.chat = message;
+    //   });
+    // });
+    // this.socket.on('receivedOrder', order => {
+    //   console.log(order.message);
+    // });
   },
   methods: {
     send() {
-      this.socket.emit('sendOrder', {
+      this.$socket.emit('sendOrder', {
         name: this.name,
         message: this.message
       });
