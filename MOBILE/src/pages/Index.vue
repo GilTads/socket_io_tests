@@ -1,61 +1,51 @@
 <template>
-  <q-layout>
-    <q-page-container>
-      <q-page>
-        <div class="row">
-          <div class="col-6 fixed-center">
-            <h2>Socket.io chat</h2>
-            <q-form class="q-gutter-md">
-              <q-input
-                v-model="name"
-                type="text"
-                filled
-                label="Digite seu nome"
-              />
-              <q-input
-                v-model="message"
-                type="text"
-                filled
-                label="Digite o texto"
-              />
-              <div class="q-pa-md row justify-center">
-                <div style="width: 100%; max-width: 400px">
-                  <q-chat-message
-                    v-for="c of chat"
-                    :key="`${c.name}${Math.random()}`"
-                    :name="c.name"
-                    :text="[c.message]"
-                    sent
-                  />
-                  <q-chat-message
-                    v-for="c of receivedChat"
-                    :key="`${c.name}${Math.random()}`"
-                    :name="c.name"
-                    :text="[c.message]"
-                  />
-                </div>
-              </div>
-              <div>
-                <q-btn
-                  label="Submit"
-                  type="button"
-                  @click="send"
-                  color="primary"
-                />
-                <q-btn
-                  label="Reset"
-                  type="reset"
-                  color="primary"
-                  flat
-                  class="q-ml-sm"
-                />
-              </div>
-            </q-form>
+  <div class="row">
+    <div class="q-pa-lg col-12">
+      <h2>Socket.io chat</h2>
+      <div class="q-ma-md">
+        <q-scroll-area
+          ref="scrollArea"
+          :visible="false"
+          style="height: 200px; max-width: 500px;"
+        >
+          <div class="q-pa-lg">
+            <q-chat-message
+              v-for="c of chat"
+              :key="`${c.name}${Math.random()}`"
+              :name="c.name"
+              :text="[c.message]"
+              :sent="c.sent"
+            />
           </div>
+        </q-scroll-area>
+      </div>
+      <!-- <div class="q-pa-md row justify-center">
+        <div style="width: 100%; max-width: 400px">
+          <q-chat-message
+            v-for="c of chat"
+            :key="`${c.name}${Math.random()}`"
+            :name="c.name"
+            :text="[c.message]"
+            :sent="c.sent"
+          />
         </div>
-      </q-page>
-    </q-page-container>
-  </q-layout>
+      </div> -->
+      <q-form class="q-gutter-md">
+        <q-input v-model="name" type="text" filled label="Digite seu nome" />
+        <q-input v-model="message" type="text" filled label="Digite o texto" />
+        <div>
+          <q-btn label="Submit" type="button" @click="send" color="primary" />
+          <q-btn
+            label="Reset"
+            type="reset"
+            color="primary"
+            flat
+            class="q-ml-sm"
+          />
+        </div>
+      </q-form>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -70,7 +60,8 @@ export default {
       messages: [],
       chat: [],
       receivedChat: [],
-      isConnected: false
+      isConnected: false,
+      sent: true
       // socket: io('localhost:3000')
     };
   },
@@ -87,7 +78,13 @@ export default {
 
     // Fired when the server sends something on the "messageChannel" channel.
     receivedOrder(data) {
-      this.receivedChat.push(data);
+      const messageObject = {
+        name: data.name,
+        message: data.message,
+        sent: !data.sent
+      };
+      this.chat.push(messageObject);
+      this.$refs.scrollArea.setScrollPosition(200, 300);
     }
 
     // previuosMessages(data) {
@@ -95,13 +92,12 @@ export default {
     //   this.$socket.emit('receivedOrder', data);
     // }
   },
-
-  created() {},
   methods: {
     send() {
       const messageObject = {
         name: this.name,
-        message: this.message
+        message: this.message,
+        sent: this.sent
       };
 
       if (this.name.length && this.message) {
@@ -109,6 +105,7 @@ export default {
       }
 
       this.$socket.emit('sendOrder', messageObject);
+      this.$refs.scrollArea.setScrollPosition(200, 300);
     }
   }
 };

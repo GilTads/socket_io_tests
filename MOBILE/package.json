@@ -2,7 +2,7 @@
   "name": "mobile",
   "version": "0.0.1",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "Socket.io chat",
   "author": "GilTads <gil.tads@gmail.com>",
   "private": true,
   "scripts": {
