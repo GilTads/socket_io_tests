@@ -8,7 +8,7 @@
           :visible="false"
           style="height: 200px; max-width: 500px;"
         >
-          <div class="q-pa-lg">
+          <div class="q-pa-lg" ref="chatArea">
             <q-chat-message
               v-for="c of chat"
               :key="`${c.name}${Math.random()}`"
@@ -50,6 +50,9 @@
 
 <script>
 // import io from 'socket.io-client';
+import { scroll } from 'quasar';
+
+const { getScrollTarget } = scroll;
 
 export default {
   name: 'PageIndex',
@@ -61,7 +64,8 @@ export default {
       chat: [],
       receivedChat: [],
       isConnected: false,
-      sent: true
+      sent: true,
+      scroll: 0
       // socket: io('localhost:3000')
     };
   },
@@ -84,7 +88,8 @@ export default {
         sent: !data.sent
       };
       this.chat.push(messageObject);
-      this.$refs.scrollArea.setScrollPosition(200, 300);
+
+      this.$refs.scrollArea.setScrollPosition(this.scroll, 300);
     }
 
     // previuosMessages(data) {
@@ -105,7 +110,11 @@ export default {
       }
 
       this.$socket.emit('sendOrder', messageObject);
-      this.$refs.scrollArea.setScrollPosition(200, 300);
+
+      const target = getScrollTarget(this.$refs.chatArea);
+      this.scroll = target.scrollHeight;
+
+      this.$refs.scrollArea.setScrollPosition(this.scroll, 300);
     }
   }
 };
