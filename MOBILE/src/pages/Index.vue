@@ -35,13 +35,6 @@
         <q-input v-model="message" type="text" filled label="Digite o texto" />
         <div>
           <q-btn label="Submit" type="button" @click="send" color="primary" />
-          <q-btn
-            label="Reset"
-            type="reset"
-            color="primary"
-            flat
-            class="q-ml-sm"
-          />
         </div>
       </q-form>
     </div>
