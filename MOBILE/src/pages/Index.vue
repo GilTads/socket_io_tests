@@ -104,6 +104,8 @@ export default {
 
       this.$socket.emit('sendOrder', messageObject);
 
+      this.message = '';
+
       const target = getScrollTarget(this.$refs.chatArea);
       this.scroll = target.scrollHeight;
 

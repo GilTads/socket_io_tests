@@ -4,6 +4,6 @@ import VueSocketIO from 'vue-socket.io';
 Vue.use(
   new VueSocketIO({
     debug: true,
-    connection: 'http://localhost:3000'
+    connection: 'http://192.168.1.147:3000/'
   })
 );
